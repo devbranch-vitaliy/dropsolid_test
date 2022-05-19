@@ -2,6 +2,7 @@
 
 namespace Drupal\dropsolid_dependency_injection;
 
+use Drupal\dropsolid_dependency_injection\DTO\PhotoDTO;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -35,7 +36,7 @@ class RestOutputService implements RestConnectionInterface {
       throw new \Exception('Invalid data returned from API');
     }
 
-    return $decoded_photos;
+    return PhotoDTO::transformMap($decoded_photos);
   }
 
   /**
@@ -43,6 +44,7 @@ class RestOutputService implements RestConnectionInterface {
    */
   public function buildPhotos(): ?array {
     try {
+      /** @var \Drupal\dropsolid_dependency_injection\DTO\PhotoDTO $photos */
       $photos = $this->getPhotos();
     }
     catch (\Exception | GuzzleException $e) {
@@ -59,7 +61,13 @@ class RestOutputService implements RestConnectionInterface {
       ];
     }
 
-    return $photo_elements;
+    return [
+      '#cache' => [
+        'max-age' => 60,
+        'contexts' => ['url'],
+      ],
+      'rest_output_block' => ['photos' => $photo_elements],
+    ];
   }
 
 }

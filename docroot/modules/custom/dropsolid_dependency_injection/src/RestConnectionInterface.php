@@ -10,7 +10,7 @@ interface RestConnectionInterface {
   /**
    * Retrieve photos from the Rest.
    *
-   * @return object[]
+   * @return \Drupal\dropsolid_dependency_injection\DTO\PhotoDTO[]
    *   The decoded request result.
    *
    * @throws \Exception

@@ -60,18 +60,7 @@ class RestOutputBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function build(): array {
-    $build = [
-      '#cache' => [
-        'max-age' => 60,
-        'contexts' => ['url'],
-      ],
-    ];
-
-    if ($photos = $this->restOutput->buildPhotos()) {
-      $build['rest_output_block']['photos'] = $photos;
-    }
-
-    return $build;
+    return $this->restOutput->buildPhotos();
   }
 
 }

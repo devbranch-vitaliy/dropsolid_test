@@ -47,18 +47,7 @@ class RestOutputController implements ContainerInjectionInterface {
    *   Build data.
    */
   public function showPhotos(): array {
-    $build = [
-      '#cache' => [
-        'max-age' => 60,
-        'contexts' => ['url'],
-      ],
-    ];
-
-    if ($photos = $this->restOutput->buildPhotos()) {
-      $build['rest_output_block']['photos'] = $photos;
-    }
-
-    return $build;
+    return $this->restOutput->buildPhotos();
   }
 
 }
