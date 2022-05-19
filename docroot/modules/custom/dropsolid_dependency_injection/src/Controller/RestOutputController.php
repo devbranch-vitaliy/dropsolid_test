@@ -2,7 +2,6 @@
 
 namespace Drupal\dropsolid_dependency_injection\Controller;
 
-use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\dropsolid_dependency_injection\RestConnectionInterface;

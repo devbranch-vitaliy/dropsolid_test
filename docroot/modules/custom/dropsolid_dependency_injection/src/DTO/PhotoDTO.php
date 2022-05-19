@@ -58,7 +58,7 @@ class PhotoDTO {
   }
 
   /**
-   * Transform input data into the DTO object.
+   * Map the array items and transform them.
    *
    * @param array $data
    *   Incoming data.
