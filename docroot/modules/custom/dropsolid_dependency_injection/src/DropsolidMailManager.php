@@ -20,7 +20,7 @@ class DropsolidMailManager extends MailManager {
     // Notice: This is an example of how to replace a standard service with
     // a custom one. But it's better to use such a solution if we want
     // to implement major changes. For a similar small fix it is better to use
-    // hook_mail_alter().
+    // hook_mail() or hook_mail_alter().
     $to = 'nope@doesntexist.com';
     return parent::doMail($module, $key, $to, $langcode, $params, $reply, $send);
   }
