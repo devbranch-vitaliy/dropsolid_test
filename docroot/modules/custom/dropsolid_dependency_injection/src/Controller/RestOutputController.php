@@ -8,40 +8,54 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\dropsolid_dependency_injection\RestConnectionInterface;
 
 /**
- * Class RestOutputController
+ * Dropsolid Dependency Injection Example: Photos.
+ *
  * @package Drupal\dropsolid_dependency_injection\Controller
  */
-class RestOutputController {
+class RestOutputController implements ContainerInjectionInterface {
 
   /**
-   * @return array
+   * Rest output service.
+   *
+   * @var \Drupal\dropsolid_dependency_injection\RestConnectionInterface
    */
-  public function showPhotos() {
+  private RestConnectionInterface $restOutput;
+
+  /**
+   * Constructs a new instance.
+   *
+   * @param \Drupal\dropsolid_dependency_injection\RestConnectionInterface $restOutput
+   *   Rest output service.
+   */
+  public function __construct(RestConnectionInterface $restOutput) {
+    $this->restOutput = $restOutput;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): RestOutputController {
+    return new static(
+      $container->get('dropsolid.restoutput'),
+    );
+  }
+
+  /**
+   * Render photos from the rest.
+   *
+   * @return array
+   *   Build data.
+   */
+  public function showPhotos(): array {
     $build = [
       '#cache' => [
         'max-age' => 60,
-        'contexts' => ['url']
-      ]
+        'contexts' => ['url'],
+      ],
     ];
 
-    try {
-      $response = \Drupal::httpClient()->request('GET', "https://jsonplaceholder.typicode.com/albums/5/photos");
-      $data = $response->getBody()->getContents();
-      $decoded = json_decode($data);
-      if (!$decoded) {
-        throw new \Exception('Invalid data returned from API');
-      }
-    } catch (\Exception $e) {
-      return $build;
-    }
-
-    foreach ($decoded as $item) {
-      $build['rest_output_block']['photos'][] = [
-        '#theme' => 'image',
-        '#uri' => $item->thumbnailUrl,
-        '#alt' => $item->title,
-        '#title' => $item->title
-      ];
+    if ($photos = $this->restOutput->buildPhotos()) {
+      $build['rest_output_block']['photos'] = $photos;
     }
 
     return $build;

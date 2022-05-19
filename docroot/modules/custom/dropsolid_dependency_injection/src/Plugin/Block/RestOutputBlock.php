@@ -15,38 +15,60 @@ use Drupal\dropsolid_dependency_injection\RestConnectionInterface;
  *  admin_label = @Translation("Rest output block"),
  * )
  */
-class RestOutputBlock extends BlockBase {
+class RestOutputBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Rest output service.
+   *
+   * @var \Drupal\dropsolid_dependency_injection\RestConnectionInterface
+   */
+  private RestConnectionInterface $restOutput;
+
+  /**
+   * Constructs a new instance.
+   *
+   * @param array $configuration
+   *   The plugin configuration, i.e. an array with configuration values keyed
+   *   by configuration option name. The special key 'context' may be used to
+   *   initialize the defined contexts by setting it to an array of context
+   *   values keyed by context names.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\dropsolid_dependency_injection\RestConnectionInterface $restOutput
+   *   Rest output service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RestConnectionInterface $restOutput) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->restOutput = $restOutput;
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): RestOutputBlock {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('dropsolid.restoutput'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(): array {
     $build = [
       '#cache' => [
         'max-age' => 60,
-        'contexts' => ['url']
-      ]
+        'contexts' => ['url'],
+      ],
     ];
 
-    try {
-      $albumId = random_int(1, 20);
-      $response = \Drupal::httpClient()->request('GET', "https://jsonplaceholder.typicode.com/albums/$albumId/photos");
-      $data = $response->getBody()->getContents();
-      $decoded = json_decode($data);
-      if (!$decoded) {
-        throw new \Exception('Invalid data returned from API');
-      }
-    } catch (\Exception $e) {
-      return $build;
-    }
-
-    foreach ($decoded as $item) {
-      $build['rest_output_block']['photos'][] = [
-        '#theme' => 'image',
-        '#uri' => $item->thumbnailUrl,
-        '#alt' => $item->title,
-        '#title' => $item->title
-      ];
+    if ($photos = $this->restOutput->buildPhotos()) {
+      $build['rest_output_block']['photos'] = $photos;
     }
 
     return $build;
