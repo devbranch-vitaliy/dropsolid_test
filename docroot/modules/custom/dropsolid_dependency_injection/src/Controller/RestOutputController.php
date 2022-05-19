@@ -35,7 +35,7 @@ class RestOutputController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container): RestOutputController {
     return new static(
-      $container->get('dropsolid.restoutput'),
+      $container->get('dropsolid_dependency_injection.restoutput'),
     );
   }
 

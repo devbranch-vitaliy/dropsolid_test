@@ -52,7 +52,7 @@ class RestOutputBlock extends BlockBase implements ContainerFactoryPluginInterfa
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('dropsolid.restoutput'),
+      $container->get('dropsolid_dependency_injection.restoutput'),
     );
   }
 
